@@ -43,8 +43,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token
     },
     session({ session, token }) {
-      session.user.id = token.id
-      session.user.role = token.role
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      session.user.id = (token as any).id as string
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      session.user.role = (token as any).role as string
       return session
     },
   },
