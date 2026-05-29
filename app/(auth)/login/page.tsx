@@ -1,3 +1,13 @@
+import type { Metadata } from 'next'
+import { Suspense } from 'react'
+import { LoginForm } from './login-form'
+
+export const metadata: Metadata = { title: 'Iniciar sesión' }
+
 export default function LoginPage() {
-  return <div>Login — Fase 2</div>
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  )
 }

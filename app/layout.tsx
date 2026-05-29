@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import { Toaster } from 'sonner'
+import { Providers } from '@/components/providers'
 import './globals.css'
 
 const geist = Geist({
@@ -24,8 +25,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`${geist.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="bg-background text-foreground flex min-h-full flex-col">
-        {children}
-        <Toaster richColors position="top-center" />
+        <Providers>
+          {children}
+          <Toaster richColors position="top-center" />
+        </Providers>
       </body>
     </html>
   )

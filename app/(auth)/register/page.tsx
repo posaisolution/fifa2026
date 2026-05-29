@@ -1,3 +1,8 @@
+import type { Metadata } from 'next'
+import { RegisterForm } from './register-form'
+
+export const metadata: Metadata = { title: 'Crear cuenta' }
+
 export default function RegisterPage() {
-  return <div>Register — Fase 2</div>
+  return <RegisterForm />
 }
