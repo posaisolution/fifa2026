@@ -48,7 +48,7 @@ export function RegisterForm() {
   }
 
   return (
-    <AuthCard title="Crear cuenta" description="Completá tus datos para empezar tu álbum">
+    <AuthCard title="Crear cuenta" description="Completa tus datos para empezar tu álbum">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="name">Nombre</Label>
@@ -100,9 +100,9 @@ export function RegisterForm() {
       </form>
 
       <div className="mt-4 text-center text-sm">
-        <span className="text-muted-foreground">¿Ya tenés cuenta? </span>
+        <span className="text-muted-foreground">¿Ya tienes cuenta? </span>
         <Link href="/login" className="text-primary font-medium hover:underline">
-          Iniciá sesión
+          Inicia sesión
         </Link>
       </div>
     </AuthCard>

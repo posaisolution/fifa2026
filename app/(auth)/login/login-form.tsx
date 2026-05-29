@@ -41,7 +41,7 @@ export function LoginForm() {
   }
 
   return (
-    <AuthCard title="Iniciar sesión" description="Ingresá tus datos para acceder a tu álbum">
+    <AuthCard title="Iniciar sesión" description="Ingresa tus datos para acceder a tu álbum">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
@@ -81,9 +81,9 @@ export function LoginForm() {
       </form>
 
       <div className="mt-4 text-center text-sm">
-        <span className="text-muted-foreground">¿No tenés cuenta? </span>
+        <span className="text-muted-foreground">¿No tienes cuenta? </span>
         <Link href="/register" className="text-primary font-medium hover:underline">
-          Registrate
+          Regístrate
         </Link>
       </div>
     </AuthCard>

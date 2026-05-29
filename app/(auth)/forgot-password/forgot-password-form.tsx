@@ -27,14 +27,14 @@ export function ForgotPasswordForm() {
     // TODO Fase 4: integrar proveedor de email (Resend / SendGrid)
     await new Promise((r) => setTimeout(r, 800))
     setSent(true)
-    toast.success('Si el email existe, vas a recibir las instrucciones.')
+    toast.success('Si el email existe, recibirás las instrucciones.')
   }
 
   if (sent) {
     return (
       <AuthCard
         title="Email enviado"
-        description="Revisá tu bandeja de entrada y seguí las instrucciones."
+        description="Revisa tu bandeja de entrada y sigue las instrucciones."
       >
         <div className="py-4 text-center">
           <div className="mb-4 text-4xl">📬</div>
