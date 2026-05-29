@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PlayerRarity {
+  COMMON
+  RARE
+  LEGEND
+}
+
+enum StickerStatus {
+  MISSING
+  OWNED
+  DUPLICATE
+}
+
+enum TradeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum PlayerPosition {
+  GK
+  DEF
+  MID
+  FWD
+}
+
+enum Confederation {
+  UEFA
+  CONMEBOL
+  CONCACAF
+  CAF
+  AFC
+  OFC
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String?
+  role         UserRole  @default(USER)
+  image        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  album         Album?
+  accounts      Account[]
+  tradesFrom    Trade[]  @relation("TradesFrom")
+  tradesTo      Trade[]  @relation("TradesTo")
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Album {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  completionPercentage Float     @default(0)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stickers Sticker[]
+
+  @@index([userId])
+}
+
+model Team {
+  id             String        @id @default(cuid())
+  fifaCode       String        @unique
+  name           String
+  group          String
+  confederation  Confederation
+  flagUrl        String
+  coverImageUrl  String?
+
+  players Player[]
+
+  @@index([group])
+  @@index([confederation])
+}
+
+model Player {
+  id       String         @id @default(cuid())
+  teamId   String
+  name     String
+  position PlayerPosition
+  number   Int
+  imageUrl String?
+  rarity   PlayerRarity   @default(COMMON)
+
+  team     Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  stickers Sticker[]
+
+  @@unique([teamId, number])
+  @@index([teamId])
+}
+
+model Sticker {
+  id         String        @id @default(cuid())
+  playerId   String
+  albumId    String
+  status     StickerStatus @default(MISSING)
+  acquiredAt DateTime?
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  album  Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+
+  tradeOffered Trade[] @relation("StickerOffered")
+  tradeWanted  Trade[] @relation("StickerWanted")
+
+  @@unique([playerId, albumId])
+  @@index([albumId])
+  @@index([status])
+}
+
+model Trade {
+  id              String      @id @default(cuid())
+  fromUserId      String
+  toUserId        String
+  stickerOfferedId String
+  stickerWantedId  String
+  status          TradeStatus @default(PENDING)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  fromUser       User    @relation("TradesFrom", fields: [fromUserId], references: [id])
+  toUser         User    @relation("TradesTo", fields: [toUserId], references: [id])
+  stickerOffered Sticker @relation("StickerOffered", fields: [stickerOfferedId], references: [id])
+  stickerWanted  Sticker @relation("StickerWanted", fields: [stickerWantedId], references: [id])
+
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([status])
+}
