@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
 import { ProposeTradeWizard } from './propose-trade'
+import { Tablero } from './tablero'
 import { cn } from '@/lib/utils'
 import { respondTrade } from '@/server/actions/trades'
 import { Badge } from '@/components/ui/badge'
@@ -31,13 +32,19 @@ type Trade = {
   stickerWanted: Sticker
 }
 
-type Tab = 'proponer' | 'recibidas' | 'enviadas' | 'repetidas'
+type Tab = 'tablero' | 'proponer' | 'recibidas' | 'enviadas' | 'repetidas'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyOffer = any
 
 interface TradesClientProps {
   duplicates: Sticker[]
   missing: Sticker[]
   incoming: Trade[]
   outgoing: Trade[]
+  boardOffers: AnyOffer[]
+  myOffers: AnyOffer[]
+  currentUserId: string
 }
 
 const STATUS_STYLE: Record<string, string> = {
@@ -126,10 +133,19 @@ function TradeRow({ trade, isIncoming }: { trade: Trade; isIncoming: boolean }) 
   )
 }
 
-export function TradesClient({ duplicates, missing, incoming, outgoing }: TradesClientProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('proponer')
+export function TradesClient({
+  duplicates,
+  missing,
+  incoming,
+  outgoing,
+  boardOffers,
+  myOffers,
+  currentUserId,
+}: TradesClientProps) {
+  const [activeTab, setActiveTab] = useState<Tab>('tablero')
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
+    { id: 'tablero', label: '🏪 Tablero', count: boardOffers.length },
     { id: 'proponer', label: '+ Proponer' },
     { id: 'recibidas', label: 'Recibidas', count: incoming.length },
     { id: 'enviadas', label: 'Enviadas', count: outgoing.length },
@@ -169,6 +185,15 @@ export function TradesClient({ duplicates, missing, incoming, outgoing }: Trades
       </div>
 
       <div className="rounded-xl bg-white p-5 shadow-sm dark:bg-gray-800">
+        {activeTab === 'tablero' && (
+          <Tablero
+            offers={boardOffers}
+            myOffers={myOffers}
+            duplicates={duplicates.map((s) => ({ id: s.id, player: s.player }))}
+            currentUserId={currentUserId}
+          />
+        )}
+
         {activeTab === 'proponer' && (
           <ProposeTradeWizard
             missingStickers={missing.map((s) => ({
