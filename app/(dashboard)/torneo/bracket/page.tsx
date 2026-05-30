@@ -37,7 +37,7 @@ function MatchBracketCard({
   }
 }) {
   const isFinished = match.status === 'FINISHED'
-  const isPlaceholder = match.homeTeamId === match.awayTeamId
+  const isPlaceholder = match.homeTeam.id === match.awayTeam.id
 
   if (isPlaceholder) {
     return (
