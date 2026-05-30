@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import { StatsClient } from './stats-client'
+import { StatsPageSkeleton } from '@/components/album/skeletons'
 
 async function StatsContent() {
   const session = await auth()
@@ -61,9 +62,7 @@ async function StatsContent() {
 
 export default function StatsPage() {
   return (
-    <Suspense
-      fallback={<div className="py-12 text-center text-gray-400">Cargando estadísticas...</div>}
-    >
+    <Suspense fallback={<StatsPageSkeleton />}>
       <StatsContent />
     </Suspense>
   )

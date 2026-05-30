@@ -13,12 +13,21 @@ export const metadata: Metadata = {
   title: { default: 'Álbum 2026', template: '%s | Álbum 2026' },
   description: 'Tu álbum digital del Mundial de Fútbol FIFA 2026 — USA · México · Canadá',
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Álbum 2026',
+  },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#1a472a',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#1a472a' },
+    { media: '(prefers-color-scheme: dark)', color: '#0d2b1a' },
+  ],
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

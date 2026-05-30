@@ -73,7 +73,7 @@ export function StickerCard({ player: initialPlayer }: StickerCardProps) {
             transition={{ duration: 0.25 }}
             className={cn(
               'relative overflow-hidden rounded-xl shadow-md',
-              'bg-gradient-to-b',
+              'bg-linear-to-b',
               RARITY_STYLE[player.rarity]
             )}
           >

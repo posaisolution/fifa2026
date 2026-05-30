@@ -3,7 +3,7 @@ import { auth, signOut } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+import { ThemeToggle } from './theme-toggle'
 
 async function getAlbumProgress(userId: string) {
   const album = await db.album.findUnique({
@@ -54,6 +54,12 @@ export async function Navbar() {
           >
             Estadísticas
           </Link>
+          <Link
+            href="/intercambios"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
+          >
+            Intercambios
+          </Link>
         </nav>
 
         {/* Progress */}
@@ -64,6 +70,7 @@ export async function Navbar() {
 
         {/* User */}
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Avatar className="size-8 border border-white/30">
             <AvatarFallback className="bg-[#0d2b1a] text-xs text-white">{initials}</AvatarFallback>
           </Avatar>
