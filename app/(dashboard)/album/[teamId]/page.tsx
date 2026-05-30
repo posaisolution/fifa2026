@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { auth } from '@/lib/auth'
+import { TeamPageSkeleton } from '@/components/album/skeletons'
 import { db } from '@/lib/db'
 import { getTeamPlayers } from '@/server/queries/album'
 import { StickerCard } from '@/components/album/sticker-card'
@@ -93,7 +94,7 @@ async function TeamContent({ teamId }: { teamId: string }) {
 export default async function TeamAlbumPage({ params }: { params: Promise<{ teamId: string }> }) {
   const { teamId } = await params
   return (
-    <Suspense fallback={<div className="py-12 text-center text-gray-400">Cargando equipo...</div>}>
+    <Suspense fallback={<TeamPageSkeleton />}>
       <TeamContent teamId={teamId} />
     </Suspense>
   )
