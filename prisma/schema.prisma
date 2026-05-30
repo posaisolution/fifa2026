@@ -87,11 +87,14 @@ model Album {
   id                   String    @id @default(cuid())
   userId               String    @unique
   completionPercentage Float     @default(0)
+  coins                Int       @default(100)
+  lastFreePackAt       DateTime?
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  stickers Sticker[]
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stickers     Sticker[]
+  packOpenings PackOpening[]
 
   @@index([userId])
 }
@@ -120,8 +123,9 @@ model Player {
   imageUrl String?
   rarity   PlayerRarity   @default(COMMON)
 
-  team     Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  stickers Sticker[]
+  team         Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  stickers     Sticker[]
+  packStickers PackSticker[]
 
   @@unique([teamId, number])
   @@index([teamId])
@@ -143,6 +147,32 @@ model Sticker {
   @@unique([playerId, albumId])
   @@index([albumId])
   @@index([status])
+}
+
+model PackOpening {
+  id        String   @id @default(cuid())
+  albumId   String
+  openedAt  DateTime @default(now())
+  coinsSpent Int     @default(0)
+  coinsEarned Int   @default(0)
+  isFree    Boolean  @default(false)
+
+  album    Album         @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  stickers PackSticker[]
+
+  @@index([albumId])
+}
+
+model PackSticker {
+  id            String  @id @default(cuid())
+  packOpeningId String
+  playerId      String
+  wasNew        Boolean
+
+  packOpening PackOpening @relation(fields: [packOpeningId], references: [id], onDelete: Cascade)
+  player      Player      @relation(fields: [playerId], references: [id])
+
+  @@index([packOpeningId])
 }
 
 model Trade {

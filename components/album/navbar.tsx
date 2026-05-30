@@ -5,19 +5,19 @@ import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ThemeToggle } from './theme-toggle'
 
-async function getAlbumProgress(userId: string) {
+async function getAlbumData(userId: string) {
   const album = await db.album.findUnique({
     where: { userId },
-    select: { completionPercentage: true },
+    select: { completionPercentage: true, coins: true },
   })
-  return album?.completionPercentage ?? 0
+  return { progress: album?.completionPercentage ?? 0, coins: album?.coins ?? 0 }
 }
 
 export async function Navbar() {
   const session = await auth()
   if (!session?.user) return null
 
-  const progress = await getAlbumProgress(session.user.id)
+  const { progress, coins } = await getAlbumData(session.user.id)
   const initials = session.user.name
     ?.split(' ')
     .map((n) => n[0])
@@ -60,12 +60,22 @@ export async function Navbar() {
           >
             Intercambios
           </Link>
+          <Link
+            href="/sobres"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
+          >
+            Sobres
+          </Link>
         </nav>
 
-        {/* Progress */}
-        <div className="hidden items-center gap-2 sm:flex">
+        {/* Coins + Progress */}
+        <div className="hidden items-center gap-3 sm:flex">
+          <Link href="/sobres" className="flex items-center gap-1 text-[#d4af37] hover:opacity-80">
+            <span className="text-sm">🪙</span>
+            <span className="text-xs font-bold">{coins}</span>
+          </Link>
           <span className="text-xs text-green-200">{progress.toFixed(1)}%</span>
-          <Progress value={progress} className="h-2 w-24 bg-white/20 [&>div]:bg-[#d4af37]" />
+          <Progress value={progress} className="h-2 w-20 bg-white/20 [&>div]:bg-[#d4af37]" />
         </div>
 
         {/* User */}
