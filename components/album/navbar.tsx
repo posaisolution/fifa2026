@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ThemeToggle } from './theme-toggle'
+import { MobileMenuButton } from './mobile-menu'
 
 async function getAlbumData(userId: string) {
   const album = await db.album.findUnique({
@@ -28,14 +29,17 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b bg-[#1a472a] text-white shadow-md">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+        {/* Hamburger — solo móvil */}
+        <MobileMenuButton />
+
         {/* Logo */}
         <Link href="/album" className="flex items-center gap-2 font-bold text-white">
           <span className="text-xl">⚽</span>
           <span className="hidden sm:inline">Álbum 2026</span>
         </Link>
 
-        {/* Navigation */}
-        <nav className="flex flex-1 items-center gap-1 sm:gap-3">
+        {/* Navigation — solo desktop */}
+        <nav className="hidden flex-1 items-center gap-1 lg:flex lg:gap-2">
           <Link
             data-tour="album"
             href="/album"
@@ -84,6 +88,9 @@ export async function Navbar() {
             ❓ Ayuda
           </Link>
         </nav>
+
+        {/* Spacer en móvil */}
+        <div className="flex-1 lg:hidden" />
 
         {/* Coins + Progress */}
         <div className="hidden items-center gap-3 sm:flex">

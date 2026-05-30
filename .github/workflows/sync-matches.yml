@@ -1,0 +1,30 @@
+name: Sync Match Results
+
+on:
+  schedule:
+    # Every hour during World Cup (Jun 11 - Jul 19, 2026)
+    # GitHub Actions cron uses UTC
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  sync:
+    name: Sync football-data.org
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call sync endpoint
+        run: |
+          response=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.APP_URL }}/api/cron/sync-matches")
+
+          echo "HTTP status: $response"
+          cat /tmp/response.json
+
+          if [ "$response" != "200" ]; then
+            echo "❌ Sync failed with status $response"
+            exit 1
+          fi
+
+          echo "✅ Sync completed"
