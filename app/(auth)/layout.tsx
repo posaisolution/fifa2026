@@ -21,6 +21,11 @@ const features = [
     desc: 'Publica tus repetidas en el tablero o propón intercambios directos.',
   },
   {
+    icon: '🏆',
+    title: 'Tracker del torneo en vivo',
+    desc: 'Tabla de posiciones, fase eliminatoria, goleadores y resultados de todos los partidos.',
+  },
+  {
     icon: '📊',
     title: 'Sigue tu progreso',
     desc: 'Estadísticas por confederación, posición y porcentaje completado en tiempo real.',

@@ -285,6 +285,8 @@ interface TournamentAdminProps {
 
 export function TournamentAdmin({ matches, teams }: TournamentAdminProps) {
   const [groupFilter, setGroupFilter] = useState('all')
+  const [syncing, setSyncing] = useState(false)
+  const [syncResult, setSyncResult] = useState<string | null>(null)
   const groups = [...new Set(matches.map((m) => m.group).filter(Boolean))].sort()
 
   const filtered = matches.filter((m) => groupFilter === 'all' || m.group === groupFilter)
@@ -292,14 +294,57 @@ export function TournamentAdmin({ matches, teams }: TournamentAdminProps) {
   const finished = matches.filter((m) => m.status === 'FINISHED').length
   const live = matches.filter((m) => m.status === 'LIVE').length
 
+  async function handleManualSync() {
+    setSyncing(true)
+    setSyncResult(null)
+    try {
+      const res = await fetch('/api/cron/sync-matches')
+      const data = await res.json()
+      if (data.ok) {
+        setSyncResult(
+          `✅ Sincronizado: ${data.updated} actualizados, ${data.created} nuevos, ${data.skipped} sin cambios (${data.duration})`
+        )
+      } else {
+        setSyncResult(`❌ Error: ${data.error}`)
+      }
+    } catch {
+      setSyncResult('❌ Error al conectar con la API')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Gestión del torneo</h1>
           <p className="text-sm text-gray-500">
             {finished} terminados · {live > 0 ? `${live} en vivo · ` : ''}
             {matches.length - finished - live} pendientes
+          </p>
+        </div>
+
+        {/* Sync button */}
+        <div className="space-y-1">
+          <button
+            onClick={handleManualSync}
+            disabled={syncing}
+            className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-700 disabled:opacity-50"
+          >
+            {syncing ? (
+              <>
+                <span className="animate-spin">⟳</span> Sincronizando...
+              </>
+            ) : (
+              <>
+                <span>🔄</span> Sync football-data.org
+              </>
+            )}
+          </button>
+          {syncResult && <p className="max-w-sm text-xs text-gray-500">{syncResult}</p>}
+          <p className="text-[10px] text-gray-400">
+            Auto: cada hora · Requiere FOOTBALL_DATA_API_KEY
           </p>
         </div>
       </div>
