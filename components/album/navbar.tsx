@@ -66,6 +66,12 @@ export async function Navbar() {
           >
             Sobres
           </Link>
+          <Link
+            href="/como-jugar"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
+          >
+            ❓ Ayuda
+          </Link>
         </nav>
 
         {/* Coins + Progress */}

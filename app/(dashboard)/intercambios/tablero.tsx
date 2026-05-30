@@ -54,8 +54,8 @@ function OfferCard({
   const isOwn = offer.userId === currentUserId
 
   const eligibleDups = myDuplicates.filter((d) =>
-    offer.wantedPlayerId
-      ? d.player.id === offer.wantedPlayer?.id
+    offer.wantedPlayer
+      ? d.player.id === offer.wantedPlayer.id
       : offer.wantedRarity
         ? d.player.rarity === offer.wantedRarity
         : true
