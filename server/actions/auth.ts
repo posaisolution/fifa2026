@@ -26,11 +26,20 @@ export async function registerUser(input: unknown) {
 
   const passwordHash = await bcrypt.hash(password, 12)
 
-  // Create user + album in a transaction
+  const allPlayers = await db.player.findMany({ select: { id: true } })
+
+  // Create user + album + all stickers in a transaction
   await db.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: { name, email, passwordHash, role: 'USER' },
     })
-    await tx.album.create({ data: { userId: user.id } })
+    const album = await tx.album.create({ data: { userId: user.id } })
+    await tx.sticker.createMany({
+      data: allPlayers.map((p) => ({
+        playerId: p.id,
+        albumId: album.id,
+        status: 'MISSING' as const,
+      })),
+    })
   })
 }
