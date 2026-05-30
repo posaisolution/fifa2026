@@ -30,6 +30,18 @@ enum TradeStatus {
   CANCELLED
 }
 
+enum OfferStatus {
+  OPEN
+  CLAIMED
+  CANCELLED
+}
+
+enum ClaimStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 enum PlayerPosition {
   GK
   DEF
@@ -58,8 +70,10 @@ model User {
 
   album         Album?
   accounts      Account[]
-  tradesFrom    Trade[]  @relation("TradesFrom")
-  tradesTo      Trade[]  @relation("TradesTo")
+  tradesFrom    Trade[]       @relation("TradesFrom")
+  tradesTo      Trade[]       @relation("TradesTo")
+  tradeOffers   TradeOffer[]
+  offerClaims   OfferClaim[]  @relation("Claimer")
 
   @@index([email])
 }
@@ -123,9 +137,12 @@ model Player {
   imageUrl String?
   rarity   PlayerRarity   @default(COMMON)
 
-  team         Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  stickers     Sticker[]
-  packStickers PackSticker[]
+  team          Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  stickers      Sticker[]
+  packStickers  PackSticker[]
+  offersOffered TradeOffer[]  @relation("OfferOffered")
+  offersWanted  TradeOffer[]  @relation("OfferWanted")
+  claimsOffered OfferClaim[]  @relation("ClaimOffered")
 
   @@unique([teamId, number])
   @@index([teamId])
@@ -193,4 +210,38 @@ model Trade {
   @@index([fromUserId])
   @@index([toUserId])
   @@index([status])
+}
+
+model TradeOffer {
+  id              String       @id @default(cuid())
+  userId          String
+  offeredPlayerId String
+  wantedPlayerId  String?
+  wantedRarity    PlayerRarity?
+  status          OfferStatus  @default(OPEN)
+  createdAt       DateTime     @default(now())
+
+  user          User         @relation(fields: [userId], references: [id])
+  offeredPlayer Player       @relation("OfferOffered", fields: [offeredPlayerId], references: [id])
+  wantedPlayer  Player?      @relation("OfferWanted", fields: [wantedPlayerId], references: [id])
+  claims        OfferClaim[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OfferClaim {
+  id              String      @id @default(cuid())
+  offerId         String
+  claimerUserId   String
+  offeredPlayerId String
+  status          ClaimStatus @default(PENDING)
+  createdAt       DateTime    @default(now())
+
+  offer         TradeOffer @relation(fields: [offerId], references: [id])
+  claimer       User       @relation("Claimer", fields: [claimerUserId], references: [id])
+  offeredPlayer Player     @relation("ClaimOffered", fields: [offeredPlayerId], references: [id])
+
+  @@index([offerId])
+  @@index([claimerUserId])
 }
