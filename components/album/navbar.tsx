@@ -37,12 +37,14 @@ export async function Navbar() {
         {/* Navigation */}
         <nav className="flex flex-1 items-center gap-1 sm:gap-3">
           <Link
+            data-tour="album"
             href="/album"
             className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
           >
             Álbum
           </Link>
           <Link
+            data-tour="buscar"
             href="/buscar"
             className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
           >
@@ -55,18 +57,21 @@ export async function Navbar() {
             Estadísticas
           </Link>
           <Link
+            data-tour="intercambios"
             href="/intercambios"
             className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
           >
             Intercambios
           </Link>
           <Link
+            data-tour="sobres"
             href="/sobres"
             className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
           >
             Sobres
           </Link>
           <Link
+            data-tour="ayuda"
             href="/como-jugar"
             className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
           >
@@ -76,7 +81,11 @@ export async function Navbar() {
 
         {/* Coins + Progress */}
         <div className="hidden items-center gap-3 sm:flex">
-          <Link href="/sobres" className="flex items-center gap-1 text-[#d4af37] hover:opacity-80">
+          <Link
+            data-tour="coins"
+            href="/sobres"
+            className="flex items-center gap-1 text-[#d4af37] hover:opacity-80"
+          >
             <span className="text-sm">🪙</span>
             <span className="text-xs font-bold">{coins}</span>
           </Link>
