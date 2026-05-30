@@ -57,6 +57,12 @@ export async function Navbar() {
             Estadísticas
           </Link>
           <Link
+            href="/torneo"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"
+          >
+            🏆 Torneo
+          </Link>
+          <Link
             data-tour="intercambios"
             href="/intercambios"
             className="rounded-md px-3 py-1.5 text-sm font-medium text-green-100 transition hover:bg-white/10 hover:text-white"

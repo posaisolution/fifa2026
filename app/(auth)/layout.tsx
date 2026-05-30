@@ -45,7 +45,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="space-y-8">
           <div>
             <h1 className="text-4xl leading-tight font-bold">
-              Tu álbum Panini
+              Tu álbum digital
               <br />
               <span className="text-[#d4af37]">del Mundial 2026</span>
             </h1>

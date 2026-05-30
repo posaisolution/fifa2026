@@ -10,7 +10,7 @@ const sections = [
     color: 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800',
     iconBg: 'bg-[#1a472a]',
     content: [
-      'El Álbum 2026 es la versión digital del álbum Panini del Mundial de Fútbol FIFA 2026 (USA · México · Canadá).',
+      'El Álbum 2026 es tu colección digital de figuritas del Mundial de Fútbol FIFA 2026 (USA · México · Canadá).',
       'Hay 47 selecciones y 235 jugadores en total, organizados en los Grupos A al L.',
       'Tu objetivo: completar el álbum al 100% consiguiendo la figurita de todos los jugadores.',
     ],

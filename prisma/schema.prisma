@@ -42,6 +42,21 @@ enum ClaimStatus {
   REJECTED
 }
 
+enum MatchStage {
+  GROUP
+  ROUND_OF_16
+  QUARTER_FINAL
+  SEMI_FINAL
+  THIRD_PLACE
+  FINAL
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+}
+
 enum PlayerPosition {
   GK
   DEF
@@ -122,7 +137,10 @@ model Team {
   flagUrl        String
   coverImageUrl  String?
 
-  players Player[]
+  players    Player[]
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+  goals       MatchGoal[]
 
   @@index([group])
   @@index([confederation])
@@ -143,6 +161,7 @@ model Player {
   offersOffered TradeOffer[]  @relation("OfferOffered")
   offersWanted  TradeOffer[]  @relation("OfferWanted")
   claimsOffered OfferClaim[]  @relation("ClaimOffered")
+  goals         MatchGoal[]
 
   @@unique([teamId, number])
   @@index([teamId])
@@ -244,4 +263,42 @@ model OfferClaim {
 
   @@index([offerId])
   @@index([claimerUserId])
+}
+
+model Match {
+  id         String      @id @default(cuid())
+  homeTeamId String
+  awayTeamId String
+  homeGoals  Int?
+  awayGoals  Int?
+  stage      MatchStage
+  group      String?
+  matchDay   Int         @default(1)
+  venue      String?
+  playedAt   DateTime?
+  status     MatchStatus @default(SCHEDULED)
+
+  homeTeam Team        @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam Team        @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  goals    MatchGoal[]
+
+  @@index([stage])
+  @@index([group])
+  @@index([status])
+}
+
+model MatchGoal {
+  id        String  @id @default(cuid())
+  matchId   String
+  teamId    String
+  playerId  String?
+  minute    Int
+  isOwnGoal Boolean @default(false)
+  isPenalty Boolean @default(false)
+
+  match  Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team   Team    @relation(fields: [teamId], references: [id])
+  player Player? @relation(fields: [playerId], references: [id])
+
+  @@index([matchId])
 }
