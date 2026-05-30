@@ -44,73 +44,77 @@ function RevealCard({
   const [flipped, setFlipped] = useState(false)
 
   return (
+    // Outer: defines the size + perspective
     <motion.div
-      initial={{ opacity: 0, y: 60, scale: 0.8 }}
+      initial={{ opacity: 0, y: 50, scale: 0.85 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay: index * 0.15, duration: 0.4, type: 'spring', stiffness: 200 }}
-      className="relative"
-      style={{ perspective: 600 }}
+      transition={{ delay: index * 0.12, duration: 0.35, type: 'spring', stiffness: 220 }}
+      className="relative w-full cursor-pointer"
+      style={{ perspective: '800px', aspectRatio: '3/4' }}
       onClick={() => isRevealing && setFlipped(true)}
     >
+      {/* Inner: rotates */}
       <motion.div
         animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.5, type: 'spring', stiffness: 150 }}
+        transition={{ duration: 0.45, type: 'spring', stiffness: 140 }}
+        className="absolute inset-0"
         style={{ transformStyle: 'preserve-3d' }}
-        className="relative"
       >
-        {/* Card back */}
+        {/* BACK face */}
         <div
-          className="relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-xl bg-linear-to-b from-[#1a472a] to-[#0d2b1a] shadow-lg"
-          style={{ backfaceVisibility: 'hidden' }}
+          className="absolute inset-0 flex flex-col items-center justify-center gap-1 overflow-hidden rounded-xl bg-linear-to-b from-[#1a472a] to-[#0d2b1a] shadow-lg"
+          style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
         >
-          <div className="flex h-full flex-col items-center justify-center gap-2">
-            <span className="text-4xl">⚽</span>
-            <span className="text-xs font-bold text-green-300">Toca para revelar</span>
-          </div>
+          <span className="text-3xl">⚽</span>
+          <span className="text-[10px] font-bold text-green-300">Toca</span>
         </div>
 
-        {/* Card front */}
+        {/* FRONT face */}
         <div
           className={cn(
-            'absolute inset-0 aspect-[3/4] w-full overflow-hidden rounded-xl bg-linear-to-b shadow-xl',
+            'absolute inset-0 flex flex-col overflow-hidden rounded-xl bg-linear-to-b shadow-xl',
             RARITY_GRADIENT[sticker.rarity],
             flipped && `shadow-2xl ${RARITY_GLOW[sticker.rarity]}`
           )}
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          style={{
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+          }}
         >
-          {/* Flag header */}
-          <div className="relative h-8 w-full overflow-hidden">
+          {/* Flag strip */}
+          <div className="relative h-7 w-full shrink-0 overflow-hidden">
             <Image
               src={sticker.teamFlagUrl}
               alt={sticker.teamName}
               fill
-              className="object-cover opacity-60"
-              sizes="200px"
+              className="object-cover opacity-50"
+              sizes="160px"
             />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xs font-bold text-white drop-shadow">{sticker.teamName}</span>
-            </div>
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white drop-shadow">
+              {sticker.teamName}
+            </span>
           </div>
 
-          {/* Player placeholder */}
-          <div className="flex flex-1 items-center justify-center bg-black/20 py-4">
-            <span className="text-5xl opacity-80">👤</span>
+          {/* Avatar */}
+          <div className="flex flex-1 items-center justify-center bg-black/20">
+            <span className="text-4xl">👤</span>
           </div>
 
-          {/* Player info */}
-          <div className="p-2 text-white">
-            <div className="flex items-center justify-between text-xs opacity-80">
+          {/* Info */}
+          <div className="shrink-0 p-1.5 text-white">
+            <div className="flex justify-between text-[9px] opacity-75">
               <span>{sticker.playerPosition}</span>
               <span>#{sticker.playerNumber}</span>
             </div>
-            <p className="mt-0.5 truncate text-xs font-bold">{sticker.playerName}</p>
-            <p className="text-[10px] opacity-70">{RARITY_LABEL[sticker.rarity]}</p>
+            <p className="truncate text-[10px] leading-tight font-bold">{sticker.playerName}</p>
+            <p className="text-[8px] opacity-60">{RARITY_LABEL[sticker.rarity]}</p>
           </div>
 
-          {/* NEW / DUPLICATE badge */}
+          {/* Badge */}
           <div
             className={cn(
-              'absolute top-1 right-1 rounded-full px-2 py-0.5 text-[10px] font-bold',
+              'absolute top-1 right-1 rounded-full px-1.5 py-0.5 text-[8px] leading-none font-bold',
               sticker.wasNew ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
             )}
           >
@@ -238,7 +242,7 @@ export function PackOpener({ coins: initialCoins, canFreePack, freePackIn }: Pac
             animate={{ opacity: 1 }}
             className="w-full max-w-lg space-y-4"
           >
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
               {result.stickers.map((sticker, i) => (
                 <RevealCard
                   key={sticker.playerId}
