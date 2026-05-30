@@ -165,7 +165,7 @@ export default function ComoJugarPage() {
           {/* Plain content */}
           {'content' in section && (
             <ul className="space-y-2">
-              {section.content.map((item, i) => (
+              {section.content!.map((item, i) => (
                 <li
                   key={i}
                   className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
@@ -180,7 +180,7 @@ export default function ComoJugarPage() {
           {/* Numbered steps */}
           {'steps' in section && (
             <div className="space-y-3">
-              {section.steps.map((step, i) => (
+              {section.steps!.map((step, i) => (
                 <div key={i} className="flex gap-3">
                   <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-gray-600 shadow-sm dark:bg-gray-700 dark:text-gray-200">
                     {i + 1}
@@ -199,7 +199,7 @@ export default function ComoJugarPage() {
           {/* Rarities */}
           {'rarities' in section && (
             <div className="space-y-3">
-              {section.rarities.map((r) => (
+              {section.rarities!.map((r) => (
                 <div key={r.name} className="flex items-center gap-3">
                   <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${r.color}`}>
                     {r.name}
