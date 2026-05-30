@@ -1,8 +1,10 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
+import { ProposeTradeWizard } from './propose-trade'
+import { cn } from '@/lib/utils'
 import { respondTrade } from '@/server/actions/trades'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -11,10 +13,12 @@ type Sticker = {
   id: string
   status: string
   player: {
+    id: string
     name: string
     number: number
     position: string
-    team: { name: string; flagUrl: string }
+    rarity: string
+    team: { name: string; flagUrl: string; group?: string }
   }
 }
 
@@ -27,8 +31,11 @@ type Trade = {
   stickerWanted: Sticker
 }
 
+type Tab = 'proponer' | 'recibidas' | 'enviadas' | 'repetidas'
+
 interface TradesClientProps {
   duplicates: Sticker[]
+  missing: Sticker[]
   incoming: Trade[]
   outgoing: Trade[]
 }
@@ -119,78 +126,136 @@ function TradeRow({ trade, isIncoming }: { trade: Trade; isIncoming: boolean }) 
   )
 }
 
-export function TradesClient({ duplicates, incoming, outgoing }: TradesClientProps) {
+export function TradesClient({ duplicates, missing, incoming, outgoing }: TradesClientProps) {
+  const [activeTab, setActiveTab] = useState<Tab>('proponer')
+
+  const tabs: { id: Tab; label: string; count?: number }[] = [
+    { id: 'proponer', label: '+ Proponer' },
+    { id: 'recibidas', label: 'Recibidas', count: incoming.length },
+    { id: 'enviadas', label: 'Enviadas', count: outgoing.length },
+    { id: 'repetidas', label: 'Mis repetidas', count: duplicates.length },
+  ]
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold">Intercambios</h1>
 
-      {/* Duplicates */}
-      <section>
-        <h2 className="mb-3 font-semibold text-gray-700 dark:text-gray-300">
-          Mis figuritas repetidas ({duplicates.length})
-        </h2>
-        {duplicates.length === 0 ? (
-          <p className="text-sm text-gray-400">No tienes figuritas repetidas todavía.</p>
-        ) : (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {duplicates.map((s) => (
-              <div
-                key={s.id}
-                className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm dark:bg-gray-800"
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              'flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition',
+              activeTab === tab.id
+                ? 'bg-[#1a472a] text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
+            )}
+          >
+            {tab.label}
+            {tab.count !== undefined && tab.count > 0 && (
+              <span
+                className={cn(
+                  'rounded-full px-1.5 py-0.5 text-[10px] font-bold',
+                  activeTab === tab.id ? 'bg-white/20' : 'bg-gray-200 dark:bg-gray-700'
+                )}
               >
-                <div className="relative size-8 overflow-hidden rounded">
-                  <Image
-                    src={s.player.team.flagUrl}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="32px"
-                  />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{s.player.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {s.player.team.name} · #{s.player.number}
-                  </p>
-                </div>
-                <Badge className="ml-auto bg-orange-100 text-orange-700">Repetida</Badge>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
 
-      {/* Incoming */}
-      <section>
-        <h2 className="mb-3 font-semibold text-gray-700 dark:text-gray-300">
-          Solicitudes recibidas ({incoming.length})
-        </h2>
-        {incoming.length === 0 ? (
-          <p className="text-sm text-gray-400">No tienes solicitudes pendientes.</p>
-        ) : (
-          <div className="space-y-2">
-            {incoming.map((t) => (
-              <TradeRow key={t.id} trade={t} isIncoming />
-            ))}
-          </div>
+      <div className="rounded-xl bg-white p-5 shadow-sm dark:bg-gray-800">
+        {activeTab === 'proponer' && (
+          <ProposeTradeWizard
+            missingStickers={missing.map((s) => ({
+              id: s.id,
+              player: {
+                id: s.player.id,
+                name: s.player.name,
+                number: s.player.number,
+                position: s.player.position,
+                rarity: s.player.rarity,
+                team: {
+                  name: s.player.team.name,
+                  flagUrl: s.player.team.flagUrl,
+                  group: s.player.team.group ?? '',
+                },
+              },
+            }))}
+            duplicateStickers={duplicates.map((s) => ({
+              id: s.id,
+              player: {
+                id: s.player.id,
+                name: s.player.name,
+                number: s.player.number,
+                position: s.player.position,
+                rarity: s.player.rarity,
+                team: { name: s.player.team.name, flagUrl: s.player.team.flagUrl },
+              },
+            }))}
+          />
         )}
-      </section>
 
-      {/* Outgoing */}
-      <section>
-        <h2 className="mb-3 font-semibold text-gray-700 dark:text-gray-300">
-          Mis solicitudes enviadas
-        </h2>
-        {outgoing.length === 0 ? (
-          <p className="text-sm text-gray-400">No has enviado solicitudes.</p>
-        ) : (
-          <div className="space-y-2">
-            {outgoing.map((t) => (
-              <TradeRow key={t.id} trade={t} isIncoming={false} />
-            ))}
+        {activeTab === 'recibidas' && (
+          <div className="space-y-3">
+            {incoming.length === 0 ? (
+              <p className="py-8 text-center text-sm text-gray-400">
+                No tienes solicitudes pendientes.
+              </p>
+            ) : (
+              incoming.map((t) => <TradeRow key={t.id} trade={t} isIncoming />)
+            )}
           </div>
         )}
-      </section>
+
+        {activeTab === 'enviadas' && (
+          <div className="space-y-3">
+            {outgoing.length === 0 ? (
+              <p className="py-8 text-center text-sm text-gray-400">No has enviado solicitudes.</p>
+            ) : (
+              outgoing.map((t) => <TradeRow key={t.id} trade={t} isIncoming={false} />)
+            )}
+          </div>
+        )}
+
+        {activeTab === 'repetidas' && (
+          <div className="space-y-2">
+            {duplicates.length === 0 ? (
+              <p className="py-8 text-center text-sm text-gray-400">
+                No tienes figuritas repetidas.
+              </p>
+            ) : (
+              duplicates.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex items-center gap-3 rounded-xl bg-gray-50 p-3 dark:bg-gray-700"
+                >
+                  <div className="relative size-8 overflow-hidden rounded">
+                    <Image
+                      src={s.player.team.flagUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="32px"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{s.player.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {s.player.team.name} · #{s.player.number}
+                    </p>
+                  </div>
+                  <Badge className="ml-auto bg-orange-100 text-xs text-orange-700">Repetida</Badge>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

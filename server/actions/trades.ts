@@ -4,6 +4,25 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 
+// Exposed as server action so the trade wizard can fetch dynamically
+export async function fetchUsersWithPlayer(playerId: string) {
+  const session = await auth()
+  if (!session?.user?.id) return []
+
+  return db.sticker.findMany({
+    where: {
+      playerId,
+      status: { in: ['OWNED', 'DUPLICATE'] },
+      album: { userId: { not: session.user.id } },
+    },
+    include: {
+      album: {
+        include: { user: { select: { id: true, name: true } } },
+      },
+    },
+  })
+}
+
 export async function requestTrade(
   toUserId: string,
   offeredPlayerId: string,

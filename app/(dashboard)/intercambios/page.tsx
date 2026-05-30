@@ -12,13 +12,19 @@ async function TradesContent() {
   const album = await db.album.findUnique({ where: { userId: session.user.id } })
   if (!album) redirect('/login')
 
-  const [duplicates, incoming, outgoing] = await Promise.all([
-    // My duplicate stickers
+  const [duplicates, missing, incoming, outgoing] = await Promise.all([
     db.sticker.findMany({
       where: { albumId: album.id, status: 'DUPLICATE' },
       include: { player: { include: { team: true } } },
+      orderBy: [{ player: { team: { name: 'asc' } } }, { player: { name: 'asc' } }],
     }),
-    // Trade requests I received
+    db.sticker.findMany({
+      where: { albumId: album.id, status: 'MISSING' },
+      include: {
+        player: { include: { team: { select: { name: true, flagUrl: true, group: true } } } },
+      },
+      orderBy: [{ player: { team: { group: 'asc' } } }, { player: { name: 'asc' } }],
+    }),
     db.trade.findMany({
       where: { toUserId: session.user.id, status: 'PENDING' },
       include: {
@@ -28,7 +34,6 @@ async function TradesContent() {
       },
       orderBy: { createdAt: 'desc' },
     }),
-    // Trade requests I sent
     db.trade.findMany({
       where: { fromUserId: session.user.id },
       include: {
@@ -41,7 +46,14 @@ async function TradesContent() {
     }),
   ])
 
-  return <TradesClient duplicates={duplicates} incoming={incoming} outgoing={outgoing} />
+  return (
+    <TradesClient
+      duplicates={duplicates}
+      missing={missing}
+      incoming={incoming}
+      outgoing={outgoing}
+    />
+  )
 }
 
 export default function IntercambiosPage() {
