@@ -1,7 +1,10 @@
 import { PrismaClient, Confederation, PlayerPosition, PlayerRarity } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
 
-const db = new PrismaClient()
+const connectionString = process.env.DATABASE_URL!
+const adapter = new PrismaPg({ connectionString })
+const db = new PrismaClient({ adapter })
 
 // FIFA World Cup 2026 — 48 qualified teams
 const teams: Array<{
@@ -732,23 +735,24 @@ async function main() {
     album = await db.album.create({ data: { userId: demoUser.id } })
   }
 
-  // Create stickers (MISSING) for all players in demo user's album
+  // Create stickers for ALL existing albums (including users already registered)
   const allPlayers = await db.player.findMany()
-  for (const player of allPlayers) {
-    await db.sticker.upsert({
-      where: { playerId_albumId: { playerId: player.id, albumId: album.id } },
-      update: {},
-      create: {
-        playerId: player.id,
-        albumId: album.id,
-        status: 'MISSING',
-      },
-    })
+  const allAlbums = await db.album.findMany()
+
+  for (const a of allAlbums) {
+    for (const player of allPlayers) {
+      await db.sticker.upsert({
+        where: { playerId_albumId: { playerId: player.id, albumId: a.id } },
+        update: {},
+        create: { playerId: player.id, albumId: a.id, status: 'MISSING' },
+      })
+    }
   }
 
   console.log(`\n🎉 Seed completado!`)
   console.log(`   Equipos: ${uniqueTeams.filter((t) => t.players.length > 0).length}`)
   console.log(`   Jugadores: ${allPlayers.length}`)
+  console.log(`   Álbumes actualizados: ${allAlbums.length}`)
   console.log(`   Admin: admin@album2026.com / Admin1234!`)
   console.log(`   Demo: demo@album2026.com / User1234!`)
 }
