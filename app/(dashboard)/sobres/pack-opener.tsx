@@ -111,10 +111,10 @@ function RevealCard({
             <p className="text-[8px] opacity-60">{RARITY_LABEL[sticker.rarity]}</p>
           </div>
 
-          {/* Badge */}
+          {/* Badge — debajo de la bandera para no tapar el nombre */}
           <div
             className={cn(
-              'absolute top-1 right-1 rounded-full px-1.5 py-0.5 text-[8px] leading-none font-bold',
+              'absolute top-8 right-1 rounded-full px-1.5 py-0.5 text-[8px] leading-none font-bold',
               sticker.wasNew ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
             )}
           >
