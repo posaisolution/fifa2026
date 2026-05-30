@@ -2,11 +2,5 @@
   "buildCommand": "prisma db push && npm run build",
   "installCommand": "npm ci",
   "framework": "nextjs",
-  "regions": ["iad1"],
-  "crons": [
-    {
-      "path": "/api/cron/sync-matches",
-      "schedule": "0 * * * *"
-    }
-  ]
+  "regions": ["iad1"]
 }
